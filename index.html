@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>O Que é Espírito?</title>
+  <meta name="description" content="Leitura: O Que é Espírito?" />
+
+  <!-- Google Analytics (GA4) -->
+  <!-- Substitua G-XXXXXXXXXX pelo seu Measurement ID do Google Analytics 4 -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-XXXXXXXXXX');
+  </script>
+
+  <style>
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+    }
+
+    header {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 14px 24px;
+      background: #16213e;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+    }
+
+    header h1 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 56px);
+    }
+
+    .pdf-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    iframe.pdf-viewer {
+      width: 100%;
+      flex: 1;
+      border: none;
+      background: #fff;
+    }
+
+    .fallback {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      flex: 1;
+      gap: 20px;
+      padding: 40px 24px;
+      text-align: center;
+    }
+
+    .fallback p {
+      font-size: 1.1rem;
+      color: #ccc;
+      max-width: 480px;
+      line-height: 1.6;
+    }
+
+    .btn {
+      display: inline-block;
+      padding: 12px 32px;
+      background: #e94560;
+      color: #fff;
+      border-radius: 6px;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+
+    .btn:hover {
+      background: #c73652;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>O Que é Espírito?</h1>
+  </header>
+
+  <main>
+    <div class="pdf-container" id="pdfContainer">
+      <iframe
+        class="pdf-viewer"
+        id="pdfFrame"
+        src="oqueespirito.pdf"
+        title="O Que é Espírito?"
+      ></iframe>
+
+      <!-- Fallback para navegadores que não suportam visualização de PDF inline -->
+      <div class="fallback" id="fallback">
+        <p>Seu navegador não suporta a visualização de PDF inline.<br />Clique no botão abaixo para baixar o documento.</p>
+        <a class="btn" href="oqueespirito.pdf" download>📄 Baixar PDF</a>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Exibe o fallback se o iframe não conseguir carregar o PDF após 4 segundos
+    var frame = document.getElementById('pdfFrame');
+    var fallback = document.getElementById('fallback');
+
+    // 4 segundos é tempo suficiente para PDFs de tamanho normal carregarem na maioria das conexões
+    var PDF_LOAD_TIMEOUT = 4000;
+    var timer = setTimeout(function () {
+      try {
+        var doc = frame.contentDocument || frame.contentWindow.document;
+        if (!doc || doc.body === null || doc.body.innerHTML === '') {
+          frame.style.display = 'none';
+          fallback.style.display = 'flex';
+        }
+      } catch (e) {
+        // Acesso bloqueado por cross-origin: o conteúdo foi carregado normalmente
+      }
+    }, PDF_LOAD_TIMEOUT);
+
+    frame.addEventListener('load', function () {
+      clearTimeout(timer);
+    });
+
+    // Rastreia evento de visualização do documento no GA4
+    window.addEventListener('load', function () {
+      if (typeof gtag === 'function') {
+        gtag('event', 'view_document', {
+          document_name: 'oqueespirito'
+        });
+      }
+    });
+  </script>
+</body>
+</html>
