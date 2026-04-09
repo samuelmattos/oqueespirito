@@ -121,9 +121,7 @@
     </div>
   </main>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
-    integrity="sha512-QvrXU4i6+SZo79vPFA9R7woO5nTO7hXhf5xW6fJbh8/r8Yj9I7M4+I4qEENm6Q3QZWfB8R6s3V6Yx53v6XfH8A=="
-    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="js/pdf.min.js"></script>
   <script>
     const PDF_URL = 'oqueespirito.pdf';
     const pdfLoading = document.getElementById('pdfLoading');
@@ -134,8 +132,7 @@
       isRendering: false
     };
 
-    pdfjsLib.GlobalWorkerOptions.workerSrc =
-      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/pdf.worker.min.js';
 
     function showLoading(show) {
       pdfLoading.hidden = !show;
