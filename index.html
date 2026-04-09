@@ -54,6 +54,29 @@
       flex-direction: column;
       flex: 1;
       min-height: 0;
+      position: relative;
+    }
+
+    .download-btn {
+      position: absolute;
+      top: 14px;
+      right: 14px;
+      z-index: 10;
+      padding: 10px 14px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: #f5f7ff;
+      background: rgba(16, 19, 32, 0.78);
+      border: 1px solid rgba(245, 247, 255, 0.24);
+      backdrop-filter: blur(6px);
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+
+    .download-btn:hover {
+      background: rgba(20, 24, 40, 0.95);
+      transform: translateY(-1px);
     }
 
     .pdf-container {
@@ -114,6 +137,7 @@
   <!-- End Google Tag Manager (noscript) -->
 
   <main>
+    <a class="download-btn" href="oqueespirito.pdf" download="oqueespirito.pdf">Baixar PDF</a>
     <div class="pdf-container" id="pdfContainer">
       <p class="pdf-status" id="pdfLoading">Carregando o documento...</p>
       <p class="pdf-status error" id="pdfError" hidden>Não foi possível abrir o PDF. Tente atualizar a página.</p>
