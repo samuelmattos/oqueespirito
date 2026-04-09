@@ -39,8 +39,8 @@
     body {
       height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #1a1a2e;
-      color: #eee;
+      background: #101320;
+      color: #f5f7ff;
       overflow: hidden;
     }
 
@@ -61,15 +61,48 @@
       display: flex;
       flex-direction: column;
       min-height: 0;
+      overflow: auto;
+      padding: 14px;
+      gap: 12px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(72, 94, 255, 0.2), transparent 45%),
+        radial-gradient(circle at 80% 20%, rgba(25, 195, 125, 0.14), transparent 40%),
+        #0f1322;
     }
 
-    iframe.pdf-viewer {
+    .pdf-status {
+      text-align: center;
+      padding: 12px;
+      color: #d9def8;
+      font-size: 0.95rem;
+    }
+
+    .pdf-status.error {
+      color: #ffb3b3;
+    }
+
+    .pdf-pages {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      padding-bottom: 12px;
+    }
+
+    .pdf-page {
+      width: min(1100px, 100%);
+      display: flex;
+      justify-content: center;
+    }
+
+    .pdf-page canvas {
       display: block;
       width: 100%;
-      height: 100%;
-      flex: 1;
-      border: none;
+      max-width: 100%;
+      height: auto;
       background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
     }
   </style>
 </head>
@@ -82,10 +115,107 @@
 
   <main>
     <div class="pdf-container" id="pdfContainer">
-      <iframe class="pdf-viewer" id="pdfFrame" src="oqueespirito.pdf" title="O Que é Espírito?"></iframe>
-
+      <p class="pdf-status" id="pdfLoading">Carregando o documento...</p>
+      <p class="pdf-status error" id="pdfError" hidden>Não foi possível abrir o PDF. Tente atualizar a página.</p>
+      <div class="pdf-pages" id="pdfPages" aria-live="polite"></div>
     </div>
   </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"
+    integrity="sha512-QvrXU4i6+SZo79vPFA9R7woO5nTO7hXhf5xW6fJbh8/r8Yj9I7M4+I4qEENm6Q3QZWfB8R6s3V6Yx53v6XfH8A=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script>
+    const PDF_URL = 'oqueespirito.pdf';
+    const pdfLoading = document.getElementById('pdfLoading');
+    const pdfError = document.getElementById('pdfError');
+    const pdfPages = document.getElementById('pdfPages');
+    const state = {
+      pdf: null,
+      isRendering: false
+    };
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc =
+      'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+    function showLoading(show) {
+      pdfLoading.hidden = !show;
+    }
+
+    function showError(show) {
+      pdfError.hidden = !show;
+    }
+
+    async function renderAllPages() {
+      if (!state.pdf || state.isRendering) {
+        return;
+      }
+
+      state.isRendering = true;
+      showError(false);
+      pdfPages.innerHTML = '';
+
+      const targetWidth = Math.min(1100, Math.max(320, pdfPages.clientWidth || window.innerWidth - 40));
+      const pixelRatio = window.devicePixelRatio || 1;
+
+      try {
+        for (let pageNumber = 1; pageNumber <= state.pdf.numPages; pageNumber += 1) {
+          const page = await state.pdf.getPage(pageNumber);
+          const unscaled = page.getViewport({ scale: 1 });
+          const scale = targetWidth / unscaled.width;
+          const viewport = page.getViewport({ scale });
+
+          const pageWrapper = document.createElement('div');
+          pageWrapper.className = 'pdf-page';
+
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d', { alpha: false });
+
+          canvas.width = Math.floor(viewport.width * pixelRatio);
+          canvas.height = Math.floor(viewport.height * pixelRatio);
+          canvas.style.width = `${Math.floor(viewport.width)}px`;
+          canvas.style.height = `${Math.floor(viewport.height)}px`;
+
+          context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+          pageWrapper.appendChild(canvas);
+          pdfPages.appendChild(pageWrapper);
+
+          await page.render({
+            canvasContext: context,
+            viewport
+          }).promise;
+        }
+      } catch (error) {
+        showError(true);
+      } finally {
+        state.isRendering = false;
+        showLoading(false);
+      }
+    }
+
+    async function initPdf() {
+      showLoading(true);
+      showError(false);
+
+      try {
+        state.pdf = await pdfjsLib.getDocument({ url: PDF_URL }).promise;
+        await renderAllPages();
+      } catch (error) {
+        showLoading(false);
+        showError(true);
+      }
+    }
+
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        renderAllPages();
+      }, 180);
+    });
+
+    initPdf();
+  </script>
 </body>
 
 </html>
