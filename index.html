@@ -25,6 +25,43 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>O Que é Espírito?</title>
   <meta name="description" content="Leitura: O Que é Espírito?" />
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #1a1a2e;
+      color: #eee;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 56px);
+    }
+
+    .pdf-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    iframe.pdf-viewer {
+      width: 100%;
+      flex: 1;
+      border: none;
+      background: #fff;
+    }
+  </style>
 </head>
 
 <body>
@@ -32,6 +69,7 @@
   <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVXZ22W5" height="0" width="0"
       style="display:none;visibility:hidden"></iframe></noscript>
   <!-- End Google Tag Manager (noscript) -->
+
   <main>
     <div class="pdf-container" id="pdfContainer">
       <iframe class="pdf-viewer" id="pdfFrame" src="oqueespirito.pdf" title="O Que é Espírito?"></iframe>
