@@ -1,29 +1,33 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
+  <!-- Google Tag Manager -->
+  <script>(function (w, d, s, l, i) {
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+          new Date().getTime(), event: 'gtm.js'
+      }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+    })(window, document, 'script', 'dataLayer', 'GTM-TVXZ22W5');</script>
+  <!-- End Google Tag Manager -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>O Que é Espírito?</title>
   <meta name="description" content="Leitura: O Que é Espírito?" />
 
-  <!-- Google Analytics (GA4) -->
-  <!-- Substitua G-XXXXXXXXXX pelo seu Measurement ID do Google Analytics 4 -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-XXXXXXXXXX"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-    gtag('config', 'G-XXXXXXXXXX');
-  </script>
-
   <style>
-    *, *::before, *::after {
+    *,
+    *::before,
+    *::after {
       box-sizing: border-box;
       margin: 0;
       padding: 0;
     }
 
-    html, body {
+    html,
+    body {
       height: 100%;
       font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: #1a1a2e;
@@ -37,7 +41,7 @@
       gap: 12px;
       padding: 14px 24px;
       background: #16213e;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
     }
 
     header h1 {
@@ -100,59 +104,22 @@
     }
   </style>
 </head>
+
 <body>
+  <!-- Google Tag Manager (noscript) -->
+  <noscript><iframe src="https://www.googletagmanager.com/ns.html?id=GTM-TVXZ22W5" height="0" width="0"
+      style="display:none;visibility:hidden"></iframe></noscript>
+  <!-- End Google Tag Manager (noscript) -->
   <header>
     <h1>O Que é Espírito?</h1>
   </header>
 
   <main>
     <div class="pdf-container" id="pdfContainer">
-      <iframe
-        class="pdf-viewer"
-        id="pdfFrame"
-        src="oqueespirito.pdf"
-        title="O Que é Espírito?"
-      ></iframe>
+      <iframe class="pdf-viewer" id="pdfFrame" src="oqueespirito.pdf" title="O Que é Espírito?"></iframe>
 
-      <!-- Fallback para navegadores que não suportam visualização de PDF inline -->
-      <div class="fallback" id="fallback">
-        <p>Seu navegador não suporta a visualização de PDF inline.<br />Clique no botão abaixo para baixar o documento.</p>
-        <a class="btn" href="oqueespirito.pdf" download>📄 Baixar PDF</a>
-      </div>
     </div>
   </main>
-
-  <script>
-    // Exibe o fallback se o iframe não conseguir carregar o PDF após 4 segundos
-    var frame = document.getElementById('pdfFrame');
-    var fallback = document.getElementById('fallback');
-
-    // 4 segundos é tempo suficiente para PDFs de tamanho normal carregarem na maioria das conexões
-    var PDF_LOAD_TIMEOUT = 4000;
-    var timer = setTimeout(function () {
-      try {
-        var doc = frame.contentDocument || frame.contentWindow.document;
-        if (!doc || doc.body === null || doc.body.innerHTML === '') {
-          frame.style.display = 'none';
-          fallback.style.display = 'flex';
-        }
-      } catch (e) {
-        // Acesso bloqueado por cross-origin: o conteúdo foi carregado normalmente
-      }
-    }, PDF_LOAD_TIMEOUT);
-
-    frame.addEventListener('load', function () {
-      clearTimeout(timer);
-    });
-
-    // Rastreia evento de visualização do documento no GA4
-    window.addEventListener('load', function () {
-      if (typeof gtag === 'function') {
-        gtag('event', 'view_document', {
-          document_name: 'oqueespirito'
-        });
-      }
-    });
-  </script>
 </body>
+
 </html>
