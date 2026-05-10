@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Devocional Maes - 30 dias</title>
+  <meta name="description" content="Leitura do PDF Devocional Maes - 30 dias" />
+
+  <style>
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #101320;
+      color: #f5f7ff;
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+    }
+
+    main {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      min-height: 0;
+      position: relative;
+    }
+
+    .back-btn,
+    .download-btn {
+      position: absolute;
+      top: 14px;
+      z-index: 10;
+      padding: 10px 14px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 600;
+      color: #f5f7ff;
+      background: rgba(16, 19, 32, 0.78);
+      border: 1px solid rgba(245, 247, 255, 0.24);
+      backdrop-filter: blur(6px);
+      transition: transform 0.15s ease, background 0.2s ease;
+    }
+
+    .back-btn {
+      left: 14px;
+    }
+
+    .download-btn {
+      right: 14px;
+    }
+
+    .back-btn:hover,
+    .download-btn:hover {
+      background: rgba(20, 24, 40, 0.95);
+      transform: translateY(-1px);
+    }
+
+    .pdf-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      overflow: auto;
+      padding: 14px;
+      gap: 12px;
+      background:
+        radial-gradient(circle at 20% 10%, rgba(72, 94, 255, 0.2), transparent 45%),
+        radial-gradient(circle at 80% 20%, rgba(25, 195, 125, 0.14), transparent 40%),
+        #0f1322;
+    }
+
+    .pdf-status {
+      text-align: center;
+      padding: 12px;
+      color: #d9def8;
+      font-size: 0.95rem;
+    }
+
+    .pdf-status.error {
+      color: #ffb3b3;
+    }
+
+    .pdf-pages {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      align-items: center;
+      padding-bottom: 12px;
+    }
+
+    .pdf-page {
+      width: min(1100px, 100%);
+      display: flex;
+      justify-content: center;
+    }
+
+    .pdf-page canvas {
+      display: block;
+      width: 100%;
+      max-width: 100%;
+      height: auto;
+      background: #fff;
+      border-radius: 6px;
+      box-shadow: 0 10px 34px rgba(0, 0, 0, 0.35);
+    }
+  </style>
+</head>
+
+<body>
+  <main>
+    
+    <a class="download-btn" href="DEVOCIONAL MÃES 30 DIAS DE ENCONTRO COM DEUS NO ORDINÁRIO.pdf" download="DEVOCIONAL MÃES 30 DIAS DE ENCONTRO COM DEUS NO ORDINÁRIO.pdf">Baixar PDF</a>
+    <div class="pdf-container" id="pdfContainer">
+      <p class="pdf-status" id="pdfLoading">Carregando o documento...</p>
+      <p class="pdf-status error" id="pdfError" hidden>Nao foi possivel abrir o PDF. Tente atualizar a pagina.</p>
+      <div class="pdf-pages" id="pdfPages" aria-live="polite"></div>
+    </div>
+  </main>
+
+  <script src="../../js/pdf.min.js"></script>
+  <script>
+    const PDF_URL = 'DEVOCIONAL MÃES 30 DIAS DE ENCONTRO COM DEUS NO ORDINÁRIO.pdf';
+    const pdfLoading = document.getElementById('pdfLoading');
+    const pdfError = document.getElementById('pdfError');
+    const pdfPages = document.getElementById('pdfPages');
+    const state = {
+      pdf: null,
+      isRendering: false
+    };
+
+    pdfjsLib.GlobalWorkerOptions.workerSrc = '../../js/pdf.worker.min.js';
+
+    function showLoading(show) {
+      pdfLoading.hidden = !show;
+    }
+
+    function showError(show) {
+      pdfError.hidden = !show;
+    }
+
+    async function renderAllPages() {
+      if (!state.pdf || state.isRendering) {
+        return;
+      }
+
+      state.isRendering = true;
+      showError(false);
+      pdfPages.innerHTML = '';
+
+      const targetWidth = Math.min(1100, Math.max(320, pdfPages.clientWidth || window.innerWidth - 40));
+      const pixelRatio = window.devicePixelRatio || 1;
+
+      try {
+        for (let pageNumber = 1; pageNumber <= state.pdf.numPages; pageNumber += 1) {
+          const page = await state.pdf.getPage(pageNumber);
+          const unscaled = page.getViewport({ scale: 1 });
+          const scale = targetWidth / unscaled.width;
+          const viewport = page.getViewport({ scale });
+
+          const pageWrapper = document.createElement('div');
+          pageWrapper.className = 'pdf-page';
+
+          const canvas = document.createElement('canvas');
+          const context = canvas.getContext('2d', { alpha: false });
+
+          canvas.width = Math.floor(viewport.width * pixelRatio);
+          canvas.height = Math.floor(viewport.height * pixelRatio);
+          canvas.style.width = `${Math.floor(viewport.width)}px`;
+          canvas.style.height = `${Math.floor(viewport.height)}px`;
+
+          context.setTransform(pixelRatio, 0, 0, pixelRatio, 0, 0);
+
+          pageWrapper.appendChild(canvas);
+          pdfPages.appendChild(pageWrapper);
+
+          await page.render({
+            canvasContext: context,
+            viewport
+          }).promise;
+        }
+      } catch (error) {
+        showError(true);
+      } finally {
+        state.isRendering = false;
+        showLoading(false);
+      }
+    }
+
+    async function initPdf() {
+      showLoading(true);
+      showError(false);
+
+      try {
+        state.pdf = await pdfjsLib.getDocument({ url: PDF_URL }).promise;
+        await renderAllPages();
+      } catch (error) {
+        showLoading(false);
+        showError(true);
+      }
+    }
+
+    let resizeTimeout;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimeout);
+      resizeTimeout = setTimeout(() => {
+        renderAllPages();
+      }, 180);
+    });
+
+    initPdf();
+  </script>
+</body>
+
+</html>
