@@ -79,6 +79,41 @@
       transform: translateY(-1px);
     }
 
+    .book-links {
+      position: absolute;
+      top: 14px;
+      left: 14px;
+      z-index: 10;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      max-width: min(900px, calc(100% - 180px));
+    }
+
+    .book-link {
+      padding: 8px 12px;
+      border-radius: 999px;
+      text-decoration: none;
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #f5f7ff;
+      background: rgba(16, 19, 32, 0.78);
+      border: 1px solid rgba(245, 247, 255, 0.24);
+      backdrop-filter: blur(6px);
+      transition: transform 0.15s ease, background 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .book-link:hover {
+      background: rgba(20, 24, 40, 0.95);
+      transform: translateY(-1px);
+    }
+
+    .book-link.active {
+      background: rgba(72, 94, 255, 0.34);
+      border-color: rgba(176, 185, 255, 0.8);
+    }
+
     .pdf-container {
       flex: 1;
       display: flex;
@@ -137,7 +172,8 @@
   <!-- End Google Tag Manager (noscript) -->
 
   <main>
-    <a class="download-btn" href="oqueespirito.pdf" download="oqueespirito.pdf">Baixar PDF</a>
+    <nav class="book-links" id="bookLinks" aria-label="Livros disponíveis"></nav>
+    <a class="download-btn" id="downloadBtn" href="#">Baixar PDF</a>
     <div class="pdf-container" id="pdfContainer">
       <p class="pdf-status" id="pdfLoading">Carregando o documento...</p>
       <p class="pdf-status error" id="pdfError" hidden>Não foi possível abrir o PDF. Tente atualizar a página.</p>
@@ -147,7 +183,28 @@
 
   <script src="js/pdf.min.js"></script>
   <script>
-    const PDF_URL = 'oqueespirito.pdf';
+    const BOOKS = [
+      {
+        title: 'Devocional Mães - 30 dias',
+        page: 'Livros/DEVOCIONAL MÃES 30 DIAS DE ENCONTRO COM DEUS NO ORDINÁRIO/index.html',
+        path: 'Livros/DEVOCIONAL MÃES 30 DIAS DE ENCONTRO COM DEUS NO ORDINÁRIO/DEVOCIONAL MÃES 30 DIAS DE ENCONTRO COM DEUS NO ORDINÁRIO.pdf'
+      },
+      {
+        title: 'Mamãe ebook cristão puerpério',
+        page: 'Livros/mamae ebook cristão puerpério/index.html',
+        path: 'Livros/mamae ebook cristão puerpério/mamae ebook cristão puerpério.pdf'
+      }
+    ];
+
+    const params = new URLSearchParams(window.location.search);
+    const selectedPdf = params.get('pdf');
+    const defaultPath = BOOKS[0].path;
+    const selectedByQuery = BOOKS.find((book) => book.path === selectedPdf);
+    const selectedBook = selectedByQuery || BOOKS[0];
+    const PDF_URL = selectedBook ? selectedBook.path : defaultPath;
+
+    const bookLinks = document.getElementById('bookLinks');
+    const downloadBtn = document.getElementById('downloadBtn');
     const pdfLoading = document.getElementById('pdfLoading');
     const pdfError = document.getElementById('pdfError');
     const pdfPages = document.getElementById('pdfPages');
@@ -155,6 +212,21 @@
       pdf: null,
       isRendering: false
     };
+
+    BOOKS.forEach((book) => {
+      const link = document.createElement('a');
+      link.className = 'book-link';
+      link.textContent = book.title;
+      link.href = book.page;
+      if (book.path === PDF_URL) {
+        link.classList.add('active');
+      }
+      bookLinks.appendChild(link);
+    });
+
+    const currentFilename = decodeURIComponent(PDF_URL.split('/').pop() || 'arquivo.pdf');
+    downloadBtn.href = PDF_URL;
+    downloadBtn.setAttribute('download', currentFilename);
 
     pdfjsLib.GlobalWorkerOptions.workerSrc = 'js/pdf.worker.min.js';
 
